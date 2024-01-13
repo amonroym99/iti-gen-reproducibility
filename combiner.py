@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 from generation import load_model_from_config
 from models.sd.ldm.models.diffusion.plms import PLMSSampler
 
-if torch.backends.mps.is_available():
-    device = 'mps'
-elif torch.cuda.is_available():
+if torch.cuda.is_available():
     device = 0
+elif torch.backends.mps.is_available():
+    device = 'mps'
 else:
     device = 'cpu'
 

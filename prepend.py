@@ -26,10 +26,10 @@ def parse_args():
 
     args = parser.parse_args()
 
-    if torch.backends.mps.is_available():
-        args.device = 'mps'
-    elif torch.cuda.is_available():
+    if torch.cuda.is_available():
         args.device = 0
+    elif torch.backends.mps.is_available():
+        args.device = 'mps'
     else:
         args.device = 'cpu'
 
