@@ -237,12 +237,6 @@ def main():
 
     )
     parser.add_argument(
-        '--gpu', 
-        type=int, 
-        default=5, 
-        help='gpu number'
-    )
-    parser.add_argument(
         '--prompt-path', 
         type=str,
         default='', 
@@ -260,9 +254,14 @@ def main():
     config = OmegaConf.load(f"{opt.config}")
     model = load_model_from_config(config, f"{opt.ckpt}")
 
-    device = torch.device("cuda:{}".format(opt.gpu)) if torch.cuda.is_available() else torch.device("cpu")
-    model = model.to(device)
+    if torch.backends.mps.is_available():
+        device = 'mps'
+    elif torch.cuda.is_available():
+        device = 0
+    else:
+        device = 'cpu'
 
+    model = model.to(device)
 
     if opt.plms:
         sampler = PLMSSampler(model)

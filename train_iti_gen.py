@@ -20,11 +20,17 @@ def parse_args():
     parser.add_argument('--steps-per-epoch', type=int, default=5, help='set # of steps we need in each epoch. We have multiple dataloaders and require updating them iteratively, so steps should be contained the same.')
     parser.add_argument('--refer-size-per-category', type=int, default=200, help='the upper bound number of reference images selected from each category')
     parser.add_argument('--token-length', type=int, default=3, help='length for the learnt token')
-    parser.add_argument('--device', type=int, default=1, help='gpu number')
     parser.add_argument('--lr', type=float, default=0.01, help='learning rate')
     parser.add_argument('--lam', type=float, default=0.8, help='lambda in Equation 7')
 
-    return parser.parse_args()
+    args = parser.parse_args()
+    if torch.backends.mps.is_available():
+        args.device = 'mps'
+    elif torch.cuda.is_available():
+        args.device = 0
+    else:
+        args.device = 'cpu'
+    return args
 
 if __name__ == '__main__':
 

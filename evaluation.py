@@ -97,7 +97,14 @@ if __name__ == '__main__':
 
     CLASSES_prompts = args.class_list
     length = len(CLASSES_prompts)
-    device_ = "cuda:{}".format(args.device) if torch.cuda.is_available() else "cpu"
+
+    if torch.backends.mps.is_available():
+        device_ = 'mps'
+    elif torch.cuda.is_available():
+        device_ = 0
+    else:
+        device_ = 'cpu'
+
 
     # evaluate
     num_each_cls_list = eval(args.img_folder, CLASSES_prompts, device_)
