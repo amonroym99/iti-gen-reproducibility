@@ -31,8 +31,8 @@ def get_prompt(text_prompt, inclusive_prompt_category_by_attribute):
 
     clip_model, _ = clip.load('ViT-L/14')
     clip_model = clip_model.eval().to(device)
-    text_embedding = clip_model.token_embedding(tokenized_text_prompt)
-    text_embedding += clip_model.positional_embedding
+    text_embedding = clip_model.token_embedding(tokenized_text_prompt).type(clip_model.dtype)
+    text_embedding += clip_model.positional_embedding.type(clip_model.dtype)
 
     # prompt has shape bs(1) x max_num_words(77) x embedding_dimension(768)
     prompt = text_embedding
@@ -41,7 +41,7 @@ def get_prompt(text_prompt, inclusive_prompt_category_by_attribute):
     prompt = prompt.permute(1, 0, 2)
     prompt = clip_model.transformer(prompt)
     prompt = prompt.permute(1, 0, 2)
-    prompt = clip_model.ln_final(prompt)
+    prompt = clip_model.ln_final(prompt).type(clip_model.dtype)
 
     return prompt
 
