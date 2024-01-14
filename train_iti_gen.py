@@ -24,10 +24,10 @@ def parse_args():
     parser.add_argument('--lam', type=float, default=0.8, help='lambda in Equation 7')
 
     args = parser.parse_args()
-    if torch.backends.mps.is_available():
-        args.device = 'mps'
-    elif torch.cuda.is_available():
+    if torch.cuda.is_available():
         args.device = 0
+    elif torch.backends.mps.is_available():
+        args.device = 'mps'
     else:
         args.device = 'cpu'
     return args
