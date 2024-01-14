@@ -1,7 +1,8 @@
-import numpy as np
-import torch.backends.mps
-from omegaconf import OmegaConf
+import argparse
+
 import matplotlib.pyplot as plt
+import torch
+from omegaconf import OmegaConf
 
 from generation import load_model_from_config
 from models.sd.ldm.models.diffusion.plms import PLMSSampler
@@ -46,44 +47,64 @@ def get_prompt(text_prompt, inclusive_prompt_category_by_attribute):
     return prompt
 
 
-def get_sample(prompt):
+def get_images(prompt, num_samples):
+    images = []
+
     model = load_model_from_config(
         config=OmegaConf.load('models/sd/configs/stable-diffusion/v1-inference.yaml'),
         ckpt='models/sd/models/ldm/stable-diffusion-v1/model.ckpt'
     ).to(device)
     sampler = PLMSSampler(model)
 
-    samples, _ = sampler.sample(
-        S=50,
-        conditioning=prompt,
-        batch_size=1,
-        shape=(4, 64, 64),
-        verbose=False,
-        # TODO: what are these doing?
-        unconditional_guidance_scale=6,
-        unconditional_conditioning=model.get_learned_conditioning([""]),
-        eta=0.0,
-        x_T=None
-    )
-    samples = model.decode_first_stage(samples)
-    samples = torch.clamp((samples + 1.0) / 2.0, min=0.0, max=1.0)
-    samples = samples.cpu().permute(0, 2, 3, 1).numpy()
+    for _ in range(num_samples):
+        # TODO: increase batch size!!!!
+        samples, _ = sampler.sample(
+            S=50,
+            conditioning=prompt,
+            batch_size=1,
+            shape=(4, 64, 64),
+            verbose=False,
+            # TODO: what are these doing?
+            unconditional_guidance_scale=6,
+            unconditional_conditioning=model.get_learned_conditioning([""]),
+            eta=0.0,
+            x_T=None
+        )
+        samples = model.decode_first_stage(samples)
+        samples = torch.clamp((samples + 1.0) / 2.0, min=0.0, max=1.0)
+        samples = samples.cpu().permute(0, 2, 3, 1).numpy()
 
-    sample = samples[0]
-    return sample
+        sample = samples[0]
+        images.append(sample)
+
+    return images
 
 
 if __name__ == '__main__':
-    text_prompt = 'A photo of a doctor'
-    # Male categories: [0, 1]
-    # Age categories: [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    # Skin_tone categories: [0, 1, 2, 3, 4, 5]
-    inclusive_prompt_category_by_attribute = {
-        'ckpts/a_headshot_of_a_person_Male_Skin_tone_Age/basis_perturbation_embed_29_Male.pth': 1,
-        'ckpts/a_headshot_of_a_person_Male_Skin_tone_Age/basis_perturbation_embed_29_Age.pth': 1,
-        # 'ckpts/a_headshot_of_a_person_Male_Skin_tone_Age/basis_perturbation_embed_29_Skin_tone.pth': 5,
-    }
+    parser = argparse.ArgumentParser(
+        prog='Prompt combiner',
+        description='Combines a text prompt with several inclusive prompts'
+    )
+    parser.add_argument('--text-prompt', type=str, required=True)
+    parser.add_argument(
+        '--inclusive-prompt',
+        type=str,
+        default=[],
+        action='append',
+        help='You can specify this multiple times. It should be of the form "path-to-basis-perturbation.pth::value", '
+             'for example, ckpts/a_headshot_of_a_person_Male_Skin_tone_Age/basis_perturbation_embed_29_Male.pth::0',
+    )
+    parser.add_argument('--num-samples', type=int, default=1)
+    parser.add_argument('--output', type=str, required=True)
+    args = parser.parse_args()
 
-    prompt = get_prompt(text_prompt, inclusive_prompt_category_by_attribute)
-    sample = get_sample(prompt)
-    plt.imsave('sample.png', sample)
+    inclusive_prompt_category_by_attribute = {}
+    for inclusive_prompt in args.inclusive_prompt:
+        attribute_path, category = inclusive_prompt.split('::')
+        inclusive_prompt_category_by_attribute[attribute_path] = int(category)
+
+    prompt = get_prompt(args.text_prompt, inclusive_prompt_category_by_attribute)
+    images = get_images(prompt, args.num_samples)
+    for i, image in enumerate(images):
+        image_path = f'{args.output}-{i}.png'
+        plt.imsave(image_path, image)
