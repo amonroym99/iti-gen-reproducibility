@@ -8,7 +8,7 @@ from generation import load_model_from_config
 from models.sd.ldm.models.diffusion.plms import PLMSSampler
 
 if torch.cuda.is_available():
-    device = 0
+    device = 'cuda:0'
 elif torch.backends.mps.is_available():
     device = 'mps'
 else:
