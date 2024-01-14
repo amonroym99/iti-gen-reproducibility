@@ -48,8 +48,6 @@ def get_prompt(text_prompt, inclusive_prompt_category_by_attribute):
 
 
 def get_images(prompt, num_samples):
-    images = []
-
     model = load_model_from_config(
         config=OmegaConf.load('models/sd/configs/stable-diffusion/v1-inference.yaml'),
         ckpt='models/sd/models/ldm/stable-diffusion-v1/model.ckpt'
@@ -74,10 +72,7 @@ def get_images(prompt, num_samples):
         samples = torch.clamp((samples + 1.0) / 2.0, min=0.0, max=1.0)
         samples = samples.cpu().permute(0, 2, 3, 1).numpy()
 
-        sample = samples[0]
-        images.append(sample)
-
-    return images
+        yield samples[0]
 
 
 if __name__ == '__main__':
@@ -104,7 +99,6 @@ if __name__ == '__main__':
         inclusive_prompt_category_by_attribute[attribute_path] = int(category)
 
     prompt = get_prompt(args.text_prompt, inclusive_prompt_category_by_attribute)
-    images = get_images(prompt, args.num_samples)
-    for i, image in enumerate(images):
+    for i, image in enumerate(get_images(prompt, args.num_samples)):
         image_path = f'{args.output}-{i}.png'
         plt.imsave(image_path, image)
