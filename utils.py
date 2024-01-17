@@ -4,10 +4,12 @@ global reference_image_category
 CelebA_attribute_list = ['5_o_Clock_Shadow', 'Arched_Eyebrows', 'Attractive', 'Bags_Under_Eyes', 'Bald',
                          'Bangs', 'Big_Lips', 'Big_Nose', 'Black_Hair', 'Blond_Hair',
                          'Blurry', 'Brown_Hair', 'Bushy_Eyebrows', 'Chubby', 'Double_Chin',
-                         'Eyeglasses', 'Eyeglasses_non_diverse', 'Goatee', 'Gray_Hair', 'Heavy_Makeup', 'High_Cheekbones',
-                          'Male', 'Mouth_Slightly_Open', 'Mustache', 'Narrow_Eyes', 'No_Beard',
-                         'Oval_Face', 'Pale_Skin', 'Pointy_Nose', 'Receding_Hairline', 'Rosy_Cheeks',
-                          'Sideburns', 'Smiling', 'Straight_Hair', 'Wavy_Hair', 'Wearing_Earrings',
+                         'Eyeglasses', 'Eyeglasses_non_diverse','Eyeglasses_Male_only_positive', 'Eyeglasses_Male_only_negative', 'Eyeglasses_Male_0',
+                         'Eyeglasses_Male_25', 'Eyeglasses_Male_50', 'Eyeglasses_Male_75', 'Eyeglasses_Male_100', 
+                         'Eyeglasses_Male_10', 'Eyeglasses_Male_30', 'Eyeglasses_Male_60', 'Eyeglasses_Male_90', 
+                         'Goatee', 'Gray_Hair', 'Heavy_Makeup', 'High_Cheekbones', 'Male', 'Mouth_Slightly_Open', 
+                         'Mustache', 'Narrow_Eyes', 'No_Beard', 'Oval_Face', 'Pale_Skin', 'Pointy_Nose', 'Receding_Hairline', 
+                         'Rosy_Cheeks', 'Sideburns', 'Smiling', 'Straight_Hair', 'Wavy_Hair', 'Wearing_Earrings',
                          'Wearing_Hat', 'Wearing_Lipstick', 'Wearing_Necklace', 'Wearing_Necktie', 'Young']
 FairFace_attribute_list = ['Age'] # may add Gender, Race if you want
 FAIR_attribute_list = ['Skin_tone']
