@@ -36,7 +36,7 @@ def split_attr_list(attribute_list='Male'):
     else:
         tmp_list = attribute_list.split(',')
         if len(tmp_list) >= 4:
-            warnings.warn("Too many attributes. May get bad results")
+            print("Too many attributes. May get bad results")
         return tmp_list, len(tmp_list)
 
 def get_dataset_for_attribute(attribute):
