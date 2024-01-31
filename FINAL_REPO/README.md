@@ -7,7 +7,7 @@ You need to run `jobfiles/celeba_single/iti_gen/train/${attribute}.sh`, for exam
 find jobfiles/celeba_single/iti_gen/train/*.sh | xargs -n1 bash
 ```
 ## Image generation
-### Generate images with vanilla Stable Diffusion
+### Generate images with vanilla Stable Diffusion
 ```shell
 python models/sd/scripts/txt2img.py \
     --config='models/sd/configs/stable-diffusion/v1-inference.yaml' \
@@ -17,7 +17,7 @@ python models/sd/scripts/txt2img.py \
     --negative_prompt="" \
     --outdir='results/celeba_single/vanilla' \
     --skip_grid \
-    --n_iter=630 \
+    --n_iter=630 \>
     --n_samples=8 \
     --seed=42
 ```
