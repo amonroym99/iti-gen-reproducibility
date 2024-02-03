@@ -162,8 +162,8 @@ cython_debug/
 # Custom for this repo
 data/
 !data/.gitkeep
-models/
-!models/.gitkeep
+/models/
+!/models/.gitkeep
 ckpts/
 !ckpts/.gitkeep
 out/
