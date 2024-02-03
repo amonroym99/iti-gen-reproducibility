@@ -36,6 +36,8 @@ class ImgDataset(Dataset):
         self.root_dir = root_dir
         self.file_list = glob.glob(self.root_dir + '/**/*.png', recursive=True)
         self.file_list += glob.glob(self.root_dir + '/**/*.jpg', recursive=True)
+        # self.file_list = glob.glob(os.path.join(self.root_dir, '*.png'))
+        # self.file_list += glob.glob(os.path.join(self.root_dir, '*.jpg'))
 
         print('Found {} generated images.'.format(len(self.file_list)))
 

@@ -4,6 +4,8 @@ import argparse
 from pytorch_lightning import seed_everything
 from iti_gen.model import ITI_GEN
 torch.backends.cudnn.enabled = True
+import time
+import numpy as np
 
 def parse_args():
     desc = "The hyperparameters for iti-gen"
@@ -45,5 +47,13 @@ if __name__ == '__main__':
     os.makedirs(folder_path, exist_ok=True)
 
     epoch_saving_list = [(i + 1) * args.save_ckpt_per_epochs for i in range(int(args.epochs // args.save_ckpt_per_epochs))]
+    times = []
     for epoch in range(args.epochs):
+        tic = time.time()
         iti_gen.train(epoch, epoch_saving_list, folder_path)
+        toc = time.time()
+        print(f"Epoch {epoch}: {toc - tic} second")
+        times.append(toc - tic)
+
+    print(f"Average epoch time: {np.mean(times)} seconds")
+    print(f"Total training time: {np.sum(times)} seconds")

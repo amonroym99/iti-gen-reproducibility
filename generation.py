@@ -7,7 +7,7 @@ from PIL import Image
 from tqdm import tqdm, trange
 from imwatermark import WatermarkEncoder
 from itertools import islice
-from einops import rearrange
+from einops import rearrange, repeat
 from torchvision.utils import make_grid
 import time
 from pytorch_lightning import seed_everything
@@ -18,6 +18,7 @@ from utils import get_folder_names_and_indexes
 from models.sd.ldm.util import instantiate_from_config
 from models.sd.ldm.models.diffusion.ddim import DDIMSampler
 from models.sd.ldm.models.diffusion.plms import PLMSSampler
+from models.sd.ldm.models.diffusion.dpm_solver import DPMSolverSampler
 
 from diffusers.pipelines.stable_diffusion.safety_checker import StableDiffusionSafetyChecker
 from transformers import AutoFeatureExtractor
@@ -246,8 +247,8 @@ def main():
 
     if opt.laion400m:
         print("Falling back to LAION 400M model...")
-        opt.config = "configs/latent-diffusion/txt2img-1p4B-eval.yaml"
-        opt.ckpt = "models/ldm/text2img-large/model.ckpt"
+        opt.config = "models/sd/configs/latent-diffusion/txt2img-1p4B-eval.yaml"
+        opt.ckpt = "models/sd/models/ldm/text2img-large/model.ckpt"
         opt.outdir = "outputs/txt2img-samples-laion400m"
 
 
@@ -266,7 +267,8 @@ def main():
     if opt.plms:
         sampler = PLMSSampler(model)
     else:
-        sampler = DDIMSampler(model)
+        sampler = DPMSolverSampler(model)
+        # sampler = DDIMSampler(model)
 
     os.makedirs(opt.outdir, exist_ok=True)
     outpath = opt.outdir
@@ -297,53 +299,58 @@ def main():
         if opt.fixed_code:
             start_code = torch.randn([opt.n_samples, opt.C, opt.H // opt.f, opt.W // opt.f], device=device)
 
-        data = [batch_size * emb[index].unsqueeze(0)]
+        c = emb[index].unsqueeze(0) 
+        c = repeat(c, 'b num_words embedding_size -> (repeat b) num_words embedding_size', repeat=batch_size)
+
+        times = []
 
         with torch.no_grad():
             with precision_scope("cuda"):
                 with model.ema_scope():
-                    tic = time.time()
                     all_samples = list()
 
                     seed_everything(opt.seed)
 
                     for n in range(opt.n_iter):
-
+                        tic = time.time()
                         # The prompt embedding for cross-attention in the Stable Diffusion
-                        for c in data:
-                            uc = None
-                            if opt.scale != 1.0:
-                                uc = model.get_learned_conditioning(batch_size * [""])
+                        uc = None
+                        if opt.scale != 1.0:
+                            uc = model.get_learned_conditioning(batch_size * [""])
 
-                            shape = [opt.C, opt.H // opt.f, opt.W // opt.f]
-                            samples_ddim, tmp = sampler.sample(S=opt.ddim_steps,
-                                                             conditioning=c,
-                                                             batch_size=opt.n_samples,
-                                                             shape=shape,
-                                                             verbose=False,
-                                                             unconditional_guidance_scale=opt.scale,
-                                                             unconditional_conditioning=uc,
-                                                             eta=opt.ddim_eta,
-                                                             x_T=start_code)
+                        shape = [opt.C, opt.H // opt.f, opt.W // opt.f]
+                        samples_ddim, tmp = sampler.sample(S=opt.ddim_steps,
+                                                            conditioning=c,
+                                                            batch_size=opt.n_samples,
+                                                            shape=shape,
+                                                            verbose=False,
+                                                            unconditional_guidance_scale=opt.scale,
+                                                            unconditional_conditioning=uc,
+                                                            eta=opt.ddim_eta,
+                                                            x_T=start_code)
 
-                            x_samples_ddim = model.decode_first_stage(samples_ddim)
-                            x_samples_ddim = torch.clamp((x_samples_ddim + 1.0) / 2.0, min=0.0, max=1.0)
-                            x_samples_ddim = x_samples_ddim.cpu().permute(0, 2, 3, 1).numpy()
+                        x_samples_ddim = model.decode_first_stage(samples_ddim)
+                        x_samples_ddim = torch.clamp((x_samples_ddim + 1.0) / 2.0, min=0.0, max=1.0)
+                        x_samples_ddim = x_samples_ddim.cpu().permute(0, 2, 3, 1).numpy()
 
-                            # x_checked_image, has_nsfw_concept = check_safety(x_samples_ddim)
+                        # x_checked_image, has_nsfw_concept = check_safety(x_samples_ddim)
 
-                            x_checked_image_torch = torch.from_numpy(x_samples_ddim).permute(0, 3, 1, 2)
+                        x_checked_image_torch = torch.from_numpy(x_samples_ddim).permute(0, 3, 1, 2)
 
-                            if not opt.skip_save:
-                                for x_sample in x_checked_image_torch:
-                                    x_sample = 255. * rearrange(x_sample.cpu().numpy(), 'c h w -> h w c')
-                                    img = Image.fromarray(x_sample.astype(np.uint8))
-                                    # img = put_watermark(img, wm_encoder)
-                                    img.save(os.path.join(sample_path, f"{base_count:05}.png"))
-                                    base_count += 1
+                        if not opt.skip_save:
+                            for x_sample in x_checked_image_torch:
+                                x_sample = 255. * rearrange(x_sample.cpu().numpy(), 'c h w -> h w c')
+                                img = Image.fromarray(x_sample.astype(np.uint8))
+                                # img = put_watermark(img, wm_encoder)
+                                img.save(os.path.join(sample_path, f"{base_count:05}.png"))
+                                base_count += 1
 
-                            if not opt.skip_grid:
-                                all_samples.append(x_checked_image_torch)
+                        if not opt.skip_grid:
+                            all_samples.append(x_checked_image_torch)
+
+                        toc = time.time()
+                        print(f"Generated {opt.n_samples} images in {toc - tic:.3f} seconds ({(toc - tic) / opt.n_samples} per image)")
+                        times.append(toc - tic)
 
                     if not opt.skip_grid:
                         # additionally, save as grid
@@ -359,7 +366,7 @@ def main():
                         img.save(os.path.join(outpath, f'grid_{folder}.png'))
                         grid_count += 1
 
-                    toc = time.time()
+        print(f"Generated {len(times) * opt.n_samples} images in {np.sum(times)} second ({np.sum(times) / len(times)} per batch, {np.sum(times) / (len(times) * opt.n_samples)} per image)")
 
     print(f"Your samples are ready and waiting for you here: \n{outpath} \n"
           f" \nEnjoy.")

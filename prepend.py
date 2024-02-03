@@ -2,6 +2,7 @@ import torch
 import argparse
 import os
 from iti_gen.model import ITI_GEN
+from pytorch_lightning import seed_everything
 torch.backends.cudnn.enabled = True
 
 def parse_args():
@@ -37,7 +38,8 @@ def parse_args():
 
 
 if __name__ == '__main__':
-
+    # TODO: is this useful?
+    seed_everything(42)
     args = parse_args()
     iti_gen = ITI_GEN(args)
 
