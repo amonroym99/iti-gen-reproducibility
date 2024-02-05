@@ -16,7 +16,14 @@ For our experiments, we generated images using Canny Edge detection, human pose,
 
 Some of the input images can be found in "test_imgs" folder.
 
-## Train the prompt
+## Training and prepending
+Only for training and prepending the ITI-GEN inclusive tokens, you need to use the iti-gen conda environment which can be created and activated using the following commands **from the root directory**.
+
+```shell
+conda env create --name iti-gen --file=environment.yml
+source activate iti-gen
+```
+
 First, you need to train the ITI-GEN inclusive token. Below there is an example for training the inclusive token "Age" using the prompt "a headshot of a person", as well as "Colorful" for "a natural scene".
 
 ```
@@ -35,13 +42,6 @@ python train_iti_gen.py \
     --save-ckpt-per-epochs=10
 ```
 
-The command should be run in the root folder of this project. If you are in "controlnet/" folder, use this command before:
-```shell
-cd ..
-```
-
-
-## Prepending
 Then, you need to append the inclusive token learnt before to a different text prompt.
 
 Here we highlight two examples for "Age" and "Colorful".
@@ -62,7 +62,7 @@ python prepend.py \
     --prepended-prompt="photograph of mount katahdin"
 ```
 
-The command should be run in the root folder of this project. If you are in "controlnet/" folder, use this command before:
+_The command should be run in the root folder of this project. If you are in "controlnet/" folder, use this command before:_
 ```shell
 cd ..
 ```
