@@ -9,7 +9,7 @@ find jobfiles/celeba_multi/*/iti_gen/train/*.sh | xargs -n1 bash
 ```
 
 ### Generate images with ITI-GEN
-You need to run `jobfiles/celeba_multi/${number_of_attributes}/iti_gen/generation/${attribute_list}.sh`, for example `jobfiles/celeba_multi/3[iti_gen/generation/Male_Young_Eyeglasses.sh`. To run all of them, do the following
+You need to run `jobfiles/celeba_multi/${number_of_attributes}/iti_gen/generation/${attribute_list}.sh`, for example `jobfiles/celeba_multi/3/iti_gen/generation/Male_Young_Eyeglasses.sh`. To run all of them, do the following
 ```shell
 find jobfiles/celeba_multi/*/iti_gen/generation/*.sh | xargs -n1 bash
 ```
