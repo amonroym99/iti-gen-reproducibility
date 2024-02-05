@@ -167,16 +167,8 @@ ckpts/
 out/
 !out/.gitkeep
 results/
-scripts/
+/scripts/
 jobfiles_archive
-
-labeller.ipynb
-labeller.py
-measure_time.py
-merger\ gallo.py
-merger.py
-original_merger.py
-sbatch.py
 controlnet/models/controlnet/*.pth
 logs
 merger_mon.py
