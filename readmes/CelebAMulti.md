@@ -29,7 +29,7 @@ find jobfiles/celeba_multi/*/hps_negative/generation/*.sh | xargs -n1 bash
 ## Evaluation
 ### Compute KL-divergences
 Using the default parameters, 104 images are generated per category.
-You need to run `jobfiles/celeba_multi/${number_of_attributes}/${method}/evaluation/${attribute_list}.sh`, for example `jobfiles/celeba_multi/3//hps_negative/evaluation/Male_Young_Eyeglasses.sh`. To run all of them, do the following
+You need to run `jobfiles/celeba_multi/${number_of_attributes}/${method}/evaluation/${attribute_list}.sh`, for example `jobfiles/celeba_multi/3/hps_negative/evaluation/Male_Young_Eyeglasses.sh`. To run all of them, do the following
 ```shell
 find jobfiles/celeba_multi -name "*.sh" | grep evaluation | xargs -n1 bash
 ```
