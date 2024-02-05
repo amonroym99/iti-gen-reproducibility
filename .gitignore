@@ -160,17 +160,17 @@ cython_debug/
 .idea/
 
 # Custom for this repo
-data/
+/data/
 !data/.gitkeep
-ckpts/
+/ckpts/
 !ckpts/.gitkeep
-out/
+/out/
 !out/.gitkeep
-results/
+/results/
 /scripts/
-jobfiles_archive
+/jobfiles_archive
 controlnet/models/controlnet/*.pth
-logs
+/logs
 merger_mon.py
 
 *.ckpt
