@@ -33,6 +33,9 @@ Download the above datasets and unzip them as follows
 ```shell
 conda env create --name iti-gen --file=environment.yml
 source activate iti-gen
+cd models/sd/
+pip install -e .
+cd ../../
 ```
 # Experiments
 All of our experiments are reproducible, and we include bash scripts to run them in the `jobfiles` folder. The bash scripts are generated automatically by Python scripts that live in the `generate_jobfiles` folder. You might be interested in modifying the script-creating scripts (e.g. to include SLURM directives, modify the batch size, etc.). If you do so, you can re-generate the bash scripts by running 
