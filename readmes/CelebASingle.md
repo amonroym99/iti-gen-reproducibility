@@ -40,7 +40,11 @@ find jobfiles/celeba_single/hps_negative/generation/*.sh | xargs -n1 bash
 ### Compute FID score
 Using the default parameters, 104 images are generated per category, making a total of $104 \times 80 = 8320$ images. In the original paper only 5K images are used, so we decide to take just 63 images per category, which adds up to $63 \times 80 = 5040$ images. 
 ```shell
-python fid.py
+python reduce_num_images.py
+python fid.py --ffhq --folder1 "results/celeba_single/5K_iti_gen"
+python fid.py --ffhq --folder1 "results/celeba_single/5K_hps"
+python fid.py --ffhq --folder1 "results/celeba_single/5K_hps_negative"
+python fid.py --ffhq --folder1 "results/celeba_single/vanilla"
 ```
 ### Compute KL-divergences
 You need to run `jobfiles/celeba_single/${method}/evaluation/${attribute}.sh`, for example `jobfiles/celeba_single/hps_negative/evaluation/Young.sh`. To run all of them, do the following
