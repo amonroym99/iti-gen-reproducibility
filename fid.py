@@ -1,60 +1,46 @@
+import argparse
 import torch
 from cleanfid import fid
-from pathlib import Path
 
 
-def get_5k_images(original_folder: Path, new_folder: Path):
-    """The new folder will contain ~5000 images that will NOT be copied (just symlinked)"""
-    # 63 * 80 = 5040
-    n = 63
+def get_device():
+    if torch.cuda.is_available():
+        return "cuda:0"
 
-    if new_folder.exists():
-        print(f"{new_folder} already exists, skipping...")
-        return
+    try:
+        if torch.backends.mps.is_available():
+            return "mps"
+    except AttributeError:
+        pass
 
-    files_to_keep = []
-    for attribute in original_folder.glob("*"):
-        for category in attribute.glob("*"):
-            files = sorted(category.glob("**/*.png"))
-            if len(files) != 104:
-                print(attribute.name, category.name, len(files))
-            files_to_keep.extend(files[-n:])
+    return "cpu"
 
-    print(f"Keeping {len(files_to_keep)} images from {original_folder} in {new_folder}")
-    new_folder.mkdir(parents=True, exist_ok=True)
-    for file in files_to_keep:
-        output_filename = file.parent.parent.name + "_" + file.parent.name + "_" + file.name
-        output_file = new_folder / output_filename
-        output_file.symlink_to(file.absolute())
+
+def get_parameters():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--folder1", type=str, required=True)
+
+    mutex_group = parser.add_mutually_exclusive_group(required=True)
+    mutex_group.add_argument("--folder2", type=str)
+    mutex_group.add_argument("--ffhq", action="store_true")
+
+    return parser.parse_args()
 
 
 if __name__ == "__main__":
-    if torch.cuda.is_available():
-        device = "cuda:0"
-    elif torch.backends.mps.is_available():
-        device = "mps"
-    else:
-        device = "cpu"
-    
-    # Get only 5K images per folder to make results comparable with the original paper
-    folder_pairs = [
-        (Path("results/celeba_single/iti_gen"), Path("results/celeba_single/5K_iti_gen")),
-        (Path("results/celeba_single/hps"), Path("results/celeba_single/5K_hps")),
-        (Path("results/celeba_single/hps_negative"), Path("results/celeba_single/5K_hps_negative"))
-    ]
-    for original_folder, new_folder in folder_pairs:
-        get_5k_images(original_folder, new_folder)
+    device = get_device()
+    args = get_parameters()
 
-    # Compute FID scores
-    folders = [Path("results/celeba_single/vanilla")] + [new_folder for _, new_folder in folder_pairs]
-    
-    for folder in folders:
-        score = fid.compute_fid(
-            str(folder),
-            device=device,
-            num_workers=0,
-            dataset_name="FFHQ",
-            dataset_res=1024,
-            dataset_split="trainval70k"
-        )
-        print(f"FID score for {folder}: {score:.3f}")
+    if args.folder2:
+        kwargs = {"fdir2": args.folder2}
+    elif args.ffhq:
+        kwargs = {
+            "dataset_name": "FFHQ",
+            "dataset_res": 1024,
+            "dataset_split": "trainval70k",
+        }
+    else:
+        raise Exception("--folder2 or --ffhq must be specified!")
+
+    score = fid.compute_fid(args.folder1, device=device, num_workers=0, **kwargs)
+    print(f"FID score for {args.folder1}: {score:.3f}")

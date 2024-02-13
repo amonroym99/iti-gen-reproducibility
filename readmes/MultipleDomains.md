@@ -29,7 +29,7 @@ python generation.py \
     --outdir="./results/multiple_domains/a_headshot_of_a_person_Skin_tone" \
     --prompt-path="ckpts/a_headshot_of_a_person_Skin_tone/original_prompt_embedding/basis_final_embed_29.pt" \
     --skip_grid \
-    --n_iter=3  \
+    --n_iter=105  \
     --n_samples=8 \
     --seed 42
 ```
@@ -43,7 +43,17 @@ python generation.py \
     --outdir="./results/multiple_domains/a_natural_scene_Colorful" \
     --prompt-path="ckpts/a_natural_scene_Colorful/prepend_prompt_embedding_a_headshot_of_a_person/basis_final_embed_29.pt" \
     --skip_grid \
-    --n_iter=3 \
+    --n_iter=126 \
     --n_samples=8 \
     --seed 42
+```
+
+## FID score
+```shell
+python fid.py \
+    --folder1 "./results/multiple_domains/a_headshot_of_a_person_Skin_tone" \
+    --ffhq 
+python fid.py \
+    --folder1 "./results/multiple_domains/a_natural_scene_Colorful" \
+    --folder2 "./data/lhq" 
 ```
