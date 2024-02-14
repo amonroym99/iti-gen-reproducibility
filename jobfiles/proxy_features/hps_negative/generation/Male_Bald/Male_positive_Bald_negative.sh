@@ -8,6 +8,6 @@ python models/sd/scripts/txt2img.py \
     --negative_prompt="bald" \
     --outdir="results/proxy_features/hps_negative/Male_Bald/Male_positive_Bald_negative" \
     --skip_grid \
-    --n_iter=1 \
+    --n_iter=13 \
     --n_samples=8 \
     --seed=2

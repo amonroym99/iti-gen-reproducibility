@@ -12,7 +12,7 @@ python generation.py \\
     --outdir="{outdir}" \\
     --prompt-path="{prompt_path}" \\
     --skip_grid \\
-    --n_iter=1 \\
+    --n_iter=13 \\
     --n_samples=8 \\
     --seed=42
 """

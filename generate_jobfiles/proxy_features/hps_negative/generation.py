@@ -11,7 +11,7 @@ python models/sd/scripts/txt2img.py \\
     --negative_prompt="{negative_prompt}" \\
     --outdir="{outdir}" \\
     --skip_grid \\
-    --n_iter=1 \\
+    --n_iter=13 \\
     --n_samples=8 \\
     --seed={seed}
 """
