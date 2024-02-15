@@ -1,6 +1,6 @@
 # Initial configuration
 ## Download weights
-Download [Stable Diffusion weights](https://huggingface.co/CompVis/stable-diffusion-v-1-4-original/resolve/main/sd-v1-4.ckpt) to `models/sd/models/ldm/stable-diffusion-v1` (create the folder if needed).
+Download [Stable Diffusion weights](https://huggingface.co/CompVis/stable-diffusion-v-1-4-original/resolve/main/sd-v1-4.ckpt) and save them as `models/sd/models/ldm/stable-diffusion-v1/model.ckpt` (create the `stable-diffusion-v1` folder if needed).
 ## Download datasets
 |   Dataset    |      Description      |       Attribute Used        |                                        Google Drive                                        |
 |:------------:|:---------------------:|:---------------------------:|:------------------------------------------------------------------------------------------:|
