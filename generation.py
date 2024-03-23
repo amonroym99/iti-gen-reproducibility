@@ -243,6 +243,12 @@ def main():
         default='', 
         help='checkpoint of the learned token embeddings that are used for image generation in Stable Diffusion'
     )
+    parser.add_argument(
+        '--negative_prompt',
+        type=str,
+        default="",
+        help="what you do not want in the image"
+    )
     opt = parser.parse_args()
 
     if opt.laion400m:
@@ -316,7 +322,7 @@ def main():
                         # The prompt embedding for cross-attention in the Stable Diffusion
                         uc = None
                         if opt.scale != 1.0:
-                            uc = model.get_learned_conditioning(batch_size * [""])
+                            uc = model.get_learned_conditioning(batch_size * [opt.negative_prompt])
 
                         shape = [opt.C, opt.H // opt.f, opt.W // opt.f]
                         samples_ddim, tmp = sampler.sample(S=opt.ddim_steps,
