@@ -60,3 +60,5 @@ This experiment compares the diversity and image quality of vanilla Stable Diffu
 This experiment compares the performance of ITI-GEN on the attribute combination Male x Eyeglasses when using different reference datasets for the Eyeglasses attribute. See instructions [here](readmes/DiversityEyeglasses.md)
 ## Benchmark
 This experiments shows that the training time is proportional to the size of the joint distribution, that grows exponentially with the number of attributes. See instructions[here](readmes/Benchmark.md)
+## Combination
+This experiment combines ITI-GEN with HPSn. See instructions [here](readmes/Combination.md)
