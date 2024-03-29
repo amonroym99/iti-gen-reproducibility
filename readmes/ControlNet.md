@@ -95,8 +95,8 @@ Run the following command:
 python pose2image.py \
     --attr-list='Age' \
     --outdir='results/Age' \
-    --prompt-path='ckpts/a_headshot_of_a_person_Age/prepend_prompt_embedding_photo_of_a_famous_woman/basis_final_embed_29.pt' \
-    --input-image='test_imgs/pose1.png' \
+    --prompt-path='../ckpts/a_headshot_of_a_person_Age/prepend_prompt_embedding_photo_of_a_famous_woman/basis_final_embed_29.pt' \
+    --input_image='test_imgs/pose1.png' \
     --num_samples=3
 ```
 - `--attr_list`: attributes separated by comma. They should all be aligned with those used in training ITI-GEN.
